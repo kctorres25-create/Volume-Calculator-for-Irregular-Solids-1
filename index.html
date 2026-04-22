@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Volume Calculator</title>
+    <style>
+        body { font-family: Times New Roman; padding: 20px; }
+        input { margin: 5px; }
+        .section { margin-bottom: 15px; }
+    </style>
+</head>
+<body bgcolor="lightblue" align="center">
+    <table width="50%" align="center" border="2" cellpadding="10"><td>
+
+<h2>Volume Calculator</h2>
+
+<div class="section">
+    <label><input type="radio" name="mode" id="Water" onchange="updateFields()"> Water</label>
+    <label><input type="radio" name="mode" id="Integral" onchange="updateFields()"> Integral</label>
+    <label><input type="radio" name="mode" id="Density" onchange="updateFields()"> Density</label>
+</div>
+
+<div class="section">
+    Initial: <input type="text" id="Ini"><br>
+    Final: <input type="text" id="Fina"><br>
+</div>
+
+<div class="section">
+    Lower Bound: <input type="text" id="LOW"><br>
+    Upper Bound: <input type="text" id="UP"><br>
+    Function f(x): <input type="text" id="X"><br>
+</div>
+
+<div class="section">
+    Mass: <input type="text" id="m5"><br>
+    Density: <input type="text" id="d3"><br>
+</div>
+
+<div class="section">
+    <button onclick="waterBtn()">Water Volume</button>
+    <button onclick="integralBtn()">Integral Volume</button>
+    <button onclick="densityBtn()">Density Volume</button>
+    <button onclick="clearAll()">Clear</button>
+</div>
+
+<h3>Results:</h3>
+<div>Result1: <span id="Result1"></span></div>
+<div>Result2: <span id="Result2"></span></div>
+<div>Result3: <span id="Result3"></span></div>
+
+<script>
+function evaluateExpression(expr, x) {
+    expr = expr.replace(/(\d)(x)/g, "$1*x");
+    expr = expr.replace(/x/g, "(" + x + ")");
+    try {
+        return eval(expr);
+    } catch {
+        return 0;
+    }
+}
+
+function waterBtn() {
+    if (document.getElementById("Water").checked) {
+        let Ini = parseFloat(document.getElementById("Ini").value) || 0;
+        let Fina = parseFloat(document.getElementById("Fina").value) || 0;
+
+        document.getElementById("Result1").innerText = (Fina - Ini) + " cm³";
+
+        if (Ini === 0 && Fina === 0) {
+            alert(" Please Input a Number!!");
+        }
+    }
+}
+
+function integralBtn() {
+    if (document.getElementById("Integral").checked) {
+        let LOW = parseFloat(document.getElementById("LOW").value) || 0;
+        let UP = parseFloat(document.getElementById("UP").value) || 0;
+        let X = document.getElementById("X").value;
+
+        let n = 100000;
+        let dx = (UP - LOW) / n;
+        let sum = 0;
+
+        for (let i = 0; i < n; i++) {
+            let k = LOW + i * dx;
+            let fx = evaluateExpression(X, k);
+            sum += Math.PI * (fx * fx);
+        }
+
+        let result = sum * dx;
+        document.getElementById("Result2").innerText = result + " units³";
+
+        if (LOW === 0 && UP === 0 && X === "") {
+            alert(" Please Input a Number!!");
+        }
+    }
+}
+
+function densityBtn() {
+    if (document.getElementById("Density").checked) {
+        let m5 = parseFloat(document.getElementById("m5").value) || 0;
+        let d3 = parseFloat(document.getElementById("d3").value) || 0;
+
+        document.getElementById("Result3").innerText = (m5 / d3) + " m³";
+
+        if (m5 === 0 && d3 === 0) {
+            alert(" Please Input a Number!!");
+        }
+    }
+}
+
+function updateFields() {
+    let Water = document.getElementById("Water").checked;
+    let Integral = document.getElementById("Integral").checked;
+    let Density = document.getElementById("Density").checked;
+
+    // Disable all first
+    ["Ini","Fina","LOW","UP","X","m5","d3"].forEach(id => {
+        document.getElementById(id).disabled = true;
+    });
+
+    if (Water) {
+        document.getElementById("Ini").disabled = false;
+        document.getElementById("Fina").disabled = false;
+    } else if (Integral) {
+        document.getElementById("LOW").disabled = false;
+        document.getElementById("UP").disabled = false;
+        document.getElementById("X").disabled = false;
+    } else if (Density) {
+        document.getElementById("m5").disabled = false;
+        document.getElementById("d3").disabled = false;
+    }
+}
+
+function clearAll() {
+    ["Ini","Fina","LOW","UP","X","m5","d3"].forEach(id => {
+        document.getElementById(id).value = "";
+    });
+
+    document.getElementById("Water").checked = false;
+    document.getElementById("Integral").checked = false;
+    document.getElementById("Density").checked = false;
+
+    document.getElementById("Result1").innerText = "";
+    document.getElementById("Result2").innerText = "";
+    document.getElementById("Result3").innerText = "";
+
+    updateFields();
+}
+
+// initialize disabled fields on load
+updateFields();
+</script>
+
+</body>
+</html>
